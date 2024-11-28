@@ -140,7 +140,5 @@ class TaskGui:
                 messagebox.showerror("Viga", "Küljed peavad olema numbrid.")
 
             self.txt_a.delete(0, "end")
-            self.txt_a.focus()
-
             self.txt_b.delete(0, "end")
             self.txt_b.focus()
