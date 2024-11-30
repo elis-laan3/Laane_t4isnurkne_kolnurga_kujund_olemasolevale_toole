@@ -1,8 +1,11 @@
+
 from tkinter import Frame, Text, messagebox
 from tkinter.ttk import Combobox, Button, Label, Entry
 
 from Circle import Circle
 from Rectangle import Rectangle
+from Right_Angled_Triangle import RightAngledTriangle
+
 
 
 class TaskGui:
@@ -16,7 +19,7 @@ class TaskGui:
         self.frame.pack(fill="both", expand=True)
 
         # Create Combobox
-        self.cmb = Combobox(self.frame, values=("Vali kujund", "Ring", "Ristkülik"))
+        self.cmb = Combobox(self.frame, values=("Vali kujund", "Ring", "Ristkülik", "Täisnurkne kolmnurk"))
         self.cmb.current(0) # Vali kujund
         self.cmb['state'] = "readonly" # Comboboxi sisu ei saa muuta
         self.cmb.grid(row=0, column=0, padx=3, pady=3, columnspan=2, sticky="ew")
@@ -24,6 +27,8 @@ class TaskGui:
         # Ujuvad vidinad (ring, ristkülik)
         self.lbl_circle, self.txt_circle = self.create_circle_widget()
         self.lbl_a, self.lbl_b, self.txt_a, self.txt_b = self.create_rectangle_widget()
+        self.lbl_kolm_a, self.lbl_kolm_b, self.txt_kolm_a, self.txt_kolm_b = self.create_RightAngledTriangle_widget()
+
 
         # Create button
         self.btn_submit = self.create_button()
@@ -34,6 +39,7 @@ class TaskGui:
         # Peidame ringi ja Ristküliku "asjad"
         self.forget_circle() # Unusta/Peida ring
         self.forget_rectangle() # Unusta/Peida ristkülik
+        self.forget_RightAngledTriangle()
 
         # "Kuula" comboboxi muutusi
         self.cmb.bind("<<ComboboxSelected>>", self.changed)
@@ -47,7 +53,7 @@ class TaskGui:
         return button
 
     def create_result(self):
-        result = Text(self.frame, height=5, width=25)
+        result = Text(self.frame, height=7, width=25)
         result.grid(row=4, column=0, padx=3, pady=3, columnspan=2, sticky="ew")
         result["state"] = "disabled" # Kasti kirjutada ei saa
         return result
@@ -79,6 +85,22 @@ class TaskGui:
 
         return label_a, label_b, text_a, text_b
 
+    def create_RightAngledTriangle_widget(self):
+        label_kolm_a = Label(self.frame, text="Külg a")
+        label_kolm_a.grid(row=1, column=0, padx=3, pady=3, sticky="ew")
+
+        text_kolm_a = Entry(self.frame, width=12)
+        text_kolm_a.focus()
+        text_kolm_a.grid(row=1, column=1, padx=3, pady=3, sticky="ew")
+
+        label_kolm_b = Label(self.frame, text="Külg b")
+        label_kolm_b.grid(row=2, column=0, padx=3, pady=3, sticky="ew")
+
+        text_kolm_b = Entry(self.frame, width=12)
+        text_kolm_b.grid(row=2, column=1, padx=3, pady=3, sticky="ew")
+
+        return label_kolm_a, label_kolm_b, text_kolm_a, text_kolm_b
+
     def forget_circle(self):
         self.lbl_circle.grid_forget()
         self.txt_circle.grid_forget()
@@ -91,19 +113,34 @@ class TaskGui:
         self.txt_b.grid_forget()
         self.btn_submit['state'] = "disabled"
 
+    def forget_RightAngledTriangle(self):
+        self.lbl_kolm_a.grid_forget()
+        self.lbl_kolm_b.grid_forget()
+        self.txt_kolm_a.grid_forget()
+        self.txt_kolm_b.grid_forget()
+        self.btn_submit['state'] = "disabled"
+
     def changed(self, event=None):
         combo_index = self.cmb.current() # Mitmes valik comboboxist (0, 1, 2)
         if combo_index == 0:
             self.forget_circle()
             self.forget_rectangle()
+            self.forget_RightAngledTriangle()
             self.btn_submit['state'] = "disabled"
         elif combo_index == 1: #ring
             self.lbl_circle, self.txt_circle = self.create_circle_widget()
             self.forget_rectangle()
+            self.forget_RightAngledTriangle()
             self.btn_submit['state'] = "normal"
         elif combo_index == 2: #ristkülik
             self.lbl_a, self.lbl_b, self.txt_a, self.txt_b = self.create_rectangle_widget()
             self.forget_circle()
+            self.forget_RightAngledTriangle()
+            self.btn_submit['state'] = "normal"
+        elif combo_index == 3: #Täisnurkne kolmnurk
+            self.lbl_kolm_a, self.lbl_kolm_b, self.txt_kolm_a, self.txt_kolm_b = self.create_RightAngledTriangle_widget()
+            self.forget_circle()
+            self.forget_rectangle()
             self.btn_submit['state'] = "normal"
 
         self.clear_result() # Tulemuskasti sisu kustutamine
@@ -143,3 +180,19 @@ class TaskGui:
             self.txt_a.delete(0, "end")
             self.txt_b.delete(0, "end")
             self.txt_b.focus()
+
+        elif cmb_index == 3: #Täisnurkne kolmnurk
+            try:
+                a = float(self.txt_kolm_a.get().strip())
+                b = float(self.txt_kolm_b.get().strip())
+                right_angled_triangle = RightAngledTriangle(a, b)
+                self.clear_result()
+                self.result.config(state="normal")
+                self.result.insert("1.0", str(right_angled_triangle))
+                self.result.config(state="disabled")
+            except ValueError:
+                messagebox.showerror('Viga, Küljed peavad olema numbrid.')
+
+
+
+
